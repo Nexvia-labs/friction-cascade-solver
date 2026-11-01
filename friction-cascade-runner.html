@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  "headline": "The Top-Down Cascade Method for Stick-Slip Analysis in Stacked Friction Systems",
+  "name": "SLIP-SPLIT-CALCULATE- V2 Algorithm",
+  "author": {
+    "@type": "Person",
+    "name": "Aryan Kumar Singh",
+    "description": "Indian High School Student and Developer"
+  },
+  "abstract": " The Top-Down Cascade Method, for finding the instantaneous acceleration of every block in a vertical stack of rigid bodies coupled by dry friction, bypassing iterative matrix solvers.",
+  "about": [
+    {
+      "@type": "Thing",
+      "name": "Computational Physics"
+    },
+    {
+      "@type": "Thing",
+      "name": "Classical Mechanics"
+    }
+  ],
+  "isAccessibleForFree": true
+}
+</script>
+<!-- Primary Meta Tags -->
+<meta name="title" content="The Top-Down Cascade Method | Aryan Kumar Singh">
+<meta name="description" content="An optimized SLIP-SPLIT-CALCULATE-V2 algorithm to solve multi-body stacked vertical friction systems without iterative matrix solvers. Developed by Aryan Kumar Singh.">
+<meta name="author" content="Aryan Kumar Singh">
+<meta name="keywords" content="Computational Physics, SLIP-SPLIT-CALCULATE-V2, Stick-Slip Analysis, Dry Friction, Kinematics, Aryan Kumar Singh">
+
+<!-- Open Graph / Facebook / LinkedIn -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Top-Down Cascade Method (SLIP-SPLIT-CALCULATE-V2)">
+<meta property="og:description" content="A deterministic computational physics algorithm for vertical friction systems. Developed by Aryan Kumar Singh.">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLIP-SPLIT-CALCULATE Runner</title>
+<style>
+:root{--bg:#F7F8FA;--surface:#fff;--ink:#1C2430;--soft:#3B4452;--muted:#5B6472;--border:#E1E5EA;--accent:#2B5D87;--accent-dark:#1F4663;--tint:#EAF1F7;--bad:#9A3B2E;--ok:#2F6B4F;
+  --sans:Avenir,"Avenir Next","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-text-size-adjust:100%}
+header{padding:20px 18px 6px;max-width:760px;margin:0 auto}
+h1{font-size:1.35rem;margin:0;line-height:1.25}
+header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+main{max-width:760px;margin:0 auto;padding:12px 18px 40px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+label.t{display:block;font-weight:600;font-size:.9rem;margin-bottom:6px}
+.hint{font-size:.8rem;color:var(--muted);margin:0 0 8px}
+textarea{width:100%;min-height:190px;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--ink);background:#FBFCFD;resize:vertical}
+select,input[type=number]{font:inherit;padding:9px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;color:var(--ink);min-height:42px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.row label{font-size:.88rem;color:var(--soft)}
+.row input[type=checkbox]{width:18px;height:18px;vertical-align:-3px;margin-right:6px}
+button{font:inherit;min-height:46px;padding:8px 16px;line-height:1.2;border-radius:6px;border:1px solid var(--border);background:#fff;color:var(--ink);cursor:pointer}
+button:active{background:var(--tint)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;flex:1 1 140px}
+button.secondary{flex:1 1 140px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.chip{background:var(--tint);color:var(--accent-dark);border-radius:999px;padding:4px 12px;font-size:.8rem;font-weight:600}
+.tablewrap{max-height:55vh;overflow:auto;border:1px solid var(--border);border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{padding:7px 12px;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap}
+thead th{position:sticky;top:0;background:#fff;border-bottom:1px solid #CDD3DA}
+td.tog{color:var(--accent-dark);font-weight:600}
+.note{font-size:.85rem;margin:12px 0 0;padding:10px 12px;border-radius:6px;background:#FBFCFD;border:1px solid var(--border)}
+.note.good{border-color:#B9D8C8;background:#F2F8F5}
+.note.warn{border-color:#E4C9C3;background:#FBF4F2}
+.note ul{margin:6px 0 0;padding-left:1.2em}
+.err{color:var(--bad);font-weight:600;font-size:.9rem;margin-top:10px}
+pre{margin:0;max-height:50vh;overflow:auto;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;background:#FBFCFD;border:1px solid var(--border);border-radius:6px;padding:10px;white-space:pre}
+details summary{cursor:pointer;font-weight:600;font-size:.9rem;padding:4px 0}
+footer{max-width:760px;margin:0 auto;padding:0 18px 30px;font-size:.78rem;color:var(--muted)}
+
+.tabbar{display:flex;gap:2px;border-bottom:1px solid var(--border);margin:-4px -4px 14px;overflow-x:auto;scrollbar-width:none}
+.tabbar::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:7px;white-space:nowrap;min-height:44px;padding:0 14px;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;border-radius:0;color:var(--muted);font-size:.9rem}
+.tab svg{width:18px;height:18px;flex:none}
+.tab.active{color:var(--accent-dark);border-bottom-color:var(--accent);font-weight:600}
+.panel{display:none}.panel.active{display:block}
+.bigtime{background:var(--tint);border-radius:8px;padding:16px;text-align:center;margin-bottom:6px}
+.bigtime .lbl{font-size:.82rem;color:var(--soft)}
+.bigtime .val{font-size:2.2rem;font-weight:700;color:var(--accent-dark);line-height:1.2;margin:2px 0;font-variant-numeric:tabular-nums}
+.bigtime .sub{font-size:.8rem;color:var(--muted)}
+h3{font-size:.95rem;margin:20px 0 8px}
+.brow{display:grid;grid-template-columns:128px 1fr 76px;align-items:center;gap:10px;margin:7px 0;font-size:.85rem}
+.brow .bar{height:10px;background:#EEF1F4;border-radius:5px;overflow:hidden}
+.brow .bar i{display:block;height:100%;background:var(--accent);border-radius:5px;min-width:2px}
+.brow .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--soft)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.cell{border:1px solid var(--border);border-radius:6px;padding:9px 11px;background:#FBFCFD}
+.cell b{display:block;font-size:1.02rem;font-variant-numeric:tabular-nums}
+.cell span{font-size:.76rem;color:var(--muted)}
+.small{font-size:.78rem;color:var(--muted);margin:10px 0 0}
+
+.gridwrap{max-height:52vh;overflow:auto;border:1px solid var(--border);border-radius:6px;background:#fff}
+table.inp{border-collapse:collapse;width:100%;table-layout:fixed}
+table.inp th{position:sticky;top:0;z-index:1;background:#F3F6F9;font-size:.78rem;line-height:1.25;padding:8px 4px;border-bottom:1px solid #CDD3DA;white-space:normal}
+table.inp th small{font-weight:400;color:var(--muted)}
+table.inp td{padding:3px;border-bottom:1px solid var(--border);white-space:normal}
+table.inp .c-idx{width:46px}
+table.inp .c-del{width:40px}
+table.inp td.idx{text-align:center;color:var(--muted);font-size:.8rem;font-variant-numeric:tabular-nums}
+table.inp input{width:100%;min-height:40px;padding:6px 8px;font:inherit;font-size:.95rem;text-align:right;border:1px solid transparent;border-radius:5px;background:#FBFCFD;color:var(--ink);font-variant-numeric:tabular-nums}
+table.inp input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px rgba(43,93,135,.18)}
+table.inp input.bad{border-color:var(--bad);background:#FBF4F2}
+table.inp input::-webkit-outer-spin-button,table.inp input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+table.inp input[type=number]{-moz-appearance:textfield}
+button.del{min-height:36px;width:34px;padding:0;border:none;background:none;color:var(--muted);font-size:1.15rem;line-height:1}
+button.del:active{background:var(--tint);color:var(--ink)}
+
+.vizbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin:0 0 14px;border:none;border-radius:6px;background:var(--accent-dark);color:#fff;font-weight:700;font-size:1rem}
+.vizbtn:active{background:var(--ink)}
+.vizbtn svg{width:20px;height:20px}
+.viz{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;flex-direction:column}
+.viz[hidden]{display:none}
+.viz-top{display:flex;align-items:center;gap:6px;padding:6px 10px;background:#fff;border-bottom:1px solid var(--border)}
+.viz-back{display:flex;align-items:center;gap:4px;min-height:42px;padding:0 12px 0 6px;border:none;background:none;color:var(--accent-dark);font-weight:600;font-size:.95rem}
+.viz-back svg{width:20px;height:20px}
+.viz-title{font-weight:700;font-size:1rem}
+.viz-sub{margin-left:auto;font-size:.78rem;color:var(--muted);text-align:right}
+.viz-legend{display:flex;flex-wrap:wrap;gap:4px 14px;padding:7px 14px;font-size:.77rem;color:var(--soft);background:#fff;border-bottom:1px solid var(--border)}
+.viz-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-2px}
+.viz-stage{flex:1;min-height:0;position:relative;background:#fff}
+.viz-scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#viz-canvas{position:sticky;top:0;display:block}
+.viz-readout{padding:7px 14px;font-size:.8rem;line-height:1.4;background:#fff;border-top:1px solid var(--border);height:5.3em;overflow-y:auto}
+.viz-readout .dim{color:var(--muted)}
+.viz-controls{padding:10px 12px 12px;background:#F3F6F9;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.vrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.viz-controls button{min-height:42px}
+.vbtn{display:flex;align-items:center;gap:6px;padding:0 14px;font-weight:600}
+.vbtn svg{width:18px;height:18px}
+.seg{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#fff}
+.seg button{border:none;border-radius:0;min-height:40px;padding:0 11px;font-size:.83rem;background:#fff;color:var(--soft)}
+.seg button.on{background:var(--accent);color:#fff;font-weight:600}
+#viz-scrub{flex:1;min-width:110px;accent-color:var(--accent);height:30px}
+.vicon{display:flex;align-items:center;justify-content:center;width:44px;padding:0!important;color:var(--accent-dark)}
+.vicon svg{width:22px;height:22px}
+.vtime{font-size:.8rem;color:var(--soft);font-variant-numeric:tabular-nums;margin-left:auto}
+.vhint{font-size:.74rem;color:var(--muted);line-height:1.35}
+body.noscroll{overflow:hidden}
+
+/* ---- Standard / Advanced switch and the four-column grid ---- */
+.kindseg{display:flex;width:100%;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff;margin:0 0 14px}
+.kindseg button{flex:1 1 0;border:none;border-radius:0;min-height:50px;padding:4px 8px;font-size:.95rem;font-weight:600;line-height:1.25;color:var(--soft);background:#fff}
+.kindseg button small{display:block;font-weight:400;font-size:.74rem;color:var(--muted)}
+.kindseg button + button{border-left:1px solid var(--border)}
+.kindseg button.on{background:var(--accent);color:#fff}
+.kindseg button.on small{color:#DCE8F2}
+table.inp.adv th{font-size:.74rem;padding:8px 2px}
+table.inp.adv td{padding:3px 2px}
+table.inp.adv input{padding:6px 4px;font-size:.88rem}
+table.inp.adv .c-idx{width:38px}
+table.inp.adv .c-del{width:34px}
+.advinfo{margin-top:12px;font-size:.84rem;color:var(--soft)}
+.advinfo ol{margin:6px 0 0;padding-left:1.25em}
+.advinfo li{margin:5px 0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <h1>Friction Cascade Solver</h1>
+  <p>Top-Down Cascade Method for stacked friction blocks, with one friction number per surface (Standard) or separate static and kinetic coefficients (Advanced). Runs on your phone; nothing is uploaded.</p>
+</header>
+
+<main>
+  <section class="card">
+    <div class="kindseg" id="kind" role="group" aria-label="Friction model">
+      <button type="button" data-kind="std" class="on" aria-pressed="true">Standard<small>&mu;s = &mu;k</small></button>
+      <button type="button" data-kind="adv" aria-pressed="false">Advanced<small>&mu;s &ne; &mu;k, per block</small></button>
+    </div>
+    <label class="t">Blocks, top to bottom</label>
+    <p class="hint" id="hint-main"></p>
+
+    <div class="row" style="margin:0 0 10px">
+      <label for="count">Number of blocks</label>
+      <input id="count" type="number" min="1" max="5000" step="1" value="5" inputmode="numeric" style="width:84px">
+      <button id="btn-set" style="min-height:42px">Set</button>
+    </div>
+
+    <div class="gridwrap">
+      <table class="inp" id="inp-table">
+        <thead><tr id="inp-head"></tr></thead>
+        <tbody id="grid"></tbody>
+      </table>
+    </div>
+    <div class="row">
+      <button class="secondary" id="btn-add">+ Add block</button>
+      <button class="secondary" id="btn-clear">Clear all</button>
+    </div>
+
+    <div class="row">
+      <label for="mode" id="lbl-mode">Frictional force is given as</label>
+      <select id="mode">
+        <option value="fmax">limiting friction f (N)</option>
+        <option value="mu">friction coefficient &mu;</option>
+      </select>
+      <span id="gwrap" hidden><label for="g">g (m/s&sup2;)</label> <input id="g" type="number" value="10" step="0.01" style="width:80px"></span>
+    </div>
+    <p class="hint" id="muhint" hidden style="margin-top:8px"></p>
+
+    <details class="advinfo" id="adv-info" hidden>
+      <summary>How &mu;s &ne; &mu;k is handled</summary>
+      <ol>
+        <li><b>Test with &mu;s.</b> An interface yields only if the force it must supply is more than its static limit fs = &mu;s&middot;g&middot;M. The same test decides whether an interface inside a sliding group fractures.</li>
+        <li><b>Push with &mu;k.</b> Once an interface slips it exerts only fk = &mu;k&middot;g&middot;M. That is the force handed down to the next group and the friction on the bottom of a sliding group.</li>
+        <li><b>Re-join.</b> If the final accelerations show a lower block running ahead of the block above it, that interface cannot be slipping the assumed way. It holds (or slips the other way) and the groups are solved again, until every interface obeys its friction law.</li>
+      </ol>
+      <p class="small">When &mu;s &gt; &mu;k, Coulomb&rsquo;s law alone can allow more than one consistent answer, for example a block that could either stay put or break loose. The method follows its fixed top-down order, and the Physical check confirms that the answer obeys Newton&rsquo;s laws and both friction laws.</p>
+    </details>
+
+    <div class="row">
+      <label><input type="checkbox" id="opt-check" checked>Physical check</label>
+      <label><input type="checkbox" id="opt-trace">Step-by-step log</label>
+    </div>
+
+    <div class="row">
+      <button class="secondary" id="btn-small" hidden>3-block example</button>
+      <button class="secondary" id="btn-example">30-block example</button>
+      <button class="secondary" id="btn-random">Random 500 blocks</button>
+      <button class="primary" id="btn-run">Run</button>
+    </div>
+    <div class="err" id="err" hidden></div>
+  </section>
+
+  <section class="card" id="out" hidden>
+    <button class="vizbtn" id="btn-viz" type="button"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8.5"/><path d="M9 7.6L14.6 11L9 14.4Z" fill="currentColor"/></svg>Visualize</button>
+    <div class="tabbar" role="tablist">
+      <button class="tab active" data-tab="p-results"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="15" height="14" rx="1.5"/><line x1="3.5" y1="9" x2="18.5" y2="9"/><line x1="9" y1="9" x2="9" y2="18"/></svg>Results</button>
+      <button class="tab" data-tab="p-timing"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="12.5" r="6.5"/><path d="M11 12.5V8.8"/><path d="M9 3.5H13"/><path d="M16.3 7.2L17.7 5.8"/></svg>Timing</button>
+      <button class="tab" data-tab="p-log"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="8.5" y1="6" x2="18.5" y2="6"/><line x1="8.5" y1="11" x2="18.5" y2="11"/><line x1="8.5" y1="16" x2="18.5" y2="16"/><circle cx="4.7" cy="6" r=".6"/><circle cx="4.7" cy="11" r=".6"/><circle cx="4.7" cy="16" r=".6"/></svg>Log</button>
+    </div>
+
+    <div class="panel active" id="p-results">
+      <div class="stats" id="stats"></div>
+      <div class="tablewrap"><table><thead><tr><th>Block(s)</th><th>a (m/s&sup2;)</th><th>State</th></tr></thead><tbody id="rows"></tbody></table></div>
+      <div class="row"><button class="secondary" id="btn-copy">Copy accelerations</button></div>
+      <div class="note" id="check" hidden></div>
+    </div>
+
+    <div class="panel" id="p-timing">
+      <div class="bigtime">
+        <div class="lbl">Time the JavaScript solver took</div>
+        <div class="val" id="t-main">&ndash;</div>
+        <div class="sub" id="t-sub"></div>
+      </div>
+
+      <h3>This run, step by step</h3>
+      <div id="t-break"></div>
+
+      <h3>Precise measurement</h3>
+      <p class="hint" id="t-hint"></p>
+      <div class="grid" id="t-grid"></div>
+      <div class="row"><button class="secondary" id="btn-bench">Measure again</button><span class="hint" id="bench-status" style="margin:0"></span></div>
+
+      <h3>Recent runs</h3>
+      <div class="tablewrap" style="max-height:none"><table><thead><tr><th>#</th><th>Blocks</th><th>Solve</th><th>Total</th></tr></thead><tbody id="t-hist"></tbody></table></div>
+      <p class="small" id="t-note"></p>
+    </div>
+
+    <div class="panel" id="p-log">
+      <p class="hint" id="lognote"></p>
+      <pre id="log" hidden></pre>
+    </div>
+  </section>
+</main>
+
+<footer>Developed by Aryan Kumar Singh &middot; skosunilsingh@gmail.com</footer>
+
+
+<div class="viz" id="viz" hidden role="dialog" aria-modal="true" aria-label="Motion visualization">
+  <div class="viz-top">
+    <button class="viz-back" id="viz-close" type="button" aria-label="Back to results"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 5L7.5 11L13.5 17"/></svg>Back</button>
+    <span class="viz-title">Visualize</span>
+    <span class="viz-sub" id="viz-sub"></span>
+  </div>
+  <div class="viz-legend">
+    <span><i style="background:rgb(43,93,135)"></i>Moves right</span>
+    <span><i style="background:rgb(194,86,28)"></i>Moves left</span>
+    <span><i style="background:rgb(138,148,163)"></i>At rest</span>
+    <span><i style="background:#1C2430;height:3px;width:14px;border-radius:1px;vertical-align:3px"></i>External force</span>
+  </div>
+  <div class="viz-stage"><div class="viz-scroll" id="viz-scroll"><canvas id="viz-canvas"></canvas><div id="viz-spacer"></div></div></div>
+  <div class="viz-readout" id="viz-readout"></div>
+  <div class="viz-controls">
+    <div class="vrow">
+      <button class="vbtn" id="viz-play" type="button"></button>
+      <button class="vbtn" id="viz-restart" type="button"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11a6.5 6.5 0 1 0 2-4.7"/><path d="M4 4.2V7.6H7.4"/></svg>Restart</button>
+      <button id="viz-zoom" class="vicon" type="button" style="visibility:hidden" aria-label="Zoom in"></button>
+      <span class="vtime" id="viz-time"></span>
+    </div>
+    <div class="vrow"><input type="range" id="viz-scrub" min="0" max="1000" value="0" aria-label="Animation time"></div>
+    <div class="vrow">
+      <div class="seg" id="viz-speed" aria-label="Playback speed"><button data-v="0.5" type="button">0.5&times;</button><button data-v="1" type="button" class="on">1&times;</button><button data-v="2" type="button">2&times;</button></div>
+      <div class="seg" id="viz-scale" aria-label="Motion scale"><button data-v="sqrt" type="button" class="on">Compressed</button><button data-v="lin" type="button">True ratio</button></div>
+    </div>
+    <div class="vhint" id="viz-hint"></div>
+  </div>
+</div>
+
+<script>
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.SlipSplitCalculate = factory();
+  }
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  var DEFAULT_OPTIONS = {
+    
+    tolerance: 1e-9,
+    
+    trace: false,
+    
+    validate: false,
+    
+    repair: false
+  };
+
+  // ------------------------------------------------------------------ helpers
+
+  function sgn(x) { return x > 0 ? 1 : (x < 0 ? -1 : 0); }
+
+  function fmt(x, d) {
+    d = (d === undefined) ? 2 : d;
+    var s = Math.abs(x).toFixed(d);
+    return (x < 0 && Number(s) !== 0 ? '-' : '+') + s;
+  }
+
+  // limits are magnitudes: no plus sign
+  function mag(x) { return Number(x).toFixed(2); }
+
+  // 0-based inclusive range -> "block 6" or "blocks 3-4" (1-based, for the log)
+  function part(a, b) { return a === b ? 'block ' + (a + 1) : 'blocks ' + (a + 1) + '-' + (b + 1); }
+
+  function nowMs() {
+    return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  }
+
+  function mergeOptions(user) {
+    var out = {}, k;
+    for (k in DEFAULT_OPTIONS) out[k] = DEFAULT_OPTIONS[k];
+    if (user) for (k in user) if (user[k] !== undefined) out[k] = user[k];
+    return out;
+  }
+
+  // ------------------------------------------------------- Phase 1: initialization
+
+  /**
+   * Phase 1, "calculate shear thresholds": f_i = mu_i * N_i, where N_i is the weight
+   * of every block at or above interface i (the floor interface carries the whole stack).
+   *   masses : array of n masses (kg)
+   *   mu     : one coefficient for all interfaces, or an array of n coefficients
+   *   g      : gravitational acceleration, default 10 m/s^2
+   * Call it once with mu_s (gives fmax) and once with mu_k (gives fkin) when the two differ.
+   */
+  function computeLimits(masses, mu, g) {
+    g = (g === undefined) ? 10 : g;
+    var n = masses.length, f = new Array(n), above = 0;
+    for (var i = 0; i < n; i++) {
+      above += masses[i];
+      f[i] = (Array.isArray(mu) ? mu[i] : mu) * g * above;
+    }
+    return f;
+  }
+
+  /**
+   * Accepts either
+   *   [{ mass, force, fmax, fkin }, ...]                       (one object per block, top to bottom)
+   *   { mass: [...], force: [...], fmax: [...], fkin: [...] }  (four arrays)
+   * "force" may be omitted (all zeros). "fkin" may be omitted (kinetic = static, as in version 1).
+   */
+  function normalizeInput(input) {
+    var m, F, f, k, i;
+    if (Array.isArray(input)) {
+      m = input.map(function (b) { return b.mass !== undefined ? b.mass : b.m; });
+      F = input.map(function (b) { return b.force !== undefined ? b.force : (b.F !== undefined ? b.F : 0); });
+      f = input.map(function (b) { return b.fmax !== undefined ? b.fmax : b.f; });
+      k = input.map(function (b) { return b.fkin !== undefined ? b.fkin : (b.k !== undefined ? b.k : (b.fmax !== undefined ? b.fmax : b.f)); });
+    } else if (input && typeof input === 'object') {
+      m = input.mass;
+      f = input.fmax;
+      k = input.fkin || f;
+      F = input.force;
+    } else {
+      throw new TypeError('Input must be an array of blocks or an object { mass, force, fmax, fkin }.');
+    }
+    if (!Array.isArray(m) && !ArrayBuffer.isView(m)) throw new TypeError('mass must be an array.');
+    var n = m.length;
+    if (n < 1) throw new RangeError('At least one block is required.');
+    if (!F) { F = new Array(n); for (i = 0; i < n; i++) F[i] = 0; }
+    if (F.length !== n || !f || f.length !== n || !k || k.length !== n) {
+      throw new RangeError('mass, force, fmax and fkin must all have the same length.');
+    }
+    var M = new Float64Array(n), FF = new Float64Array(n), LL = new Float64Array(n), KK = new Float64Array(n), differs = false;
+    for (i = 0; i < n; i++) {
+      M[i] = Number(m[i]); FF[i] = Number(F[i]); LL[i] = Number(f[i]); KK[i] = Number(k[i]);
+      if (!isFinite(M[i]) || M[i] <= 0) throw new RangeError('Block ' + (i + 1) + ': mass must be a positive number.');
+      if (!isFinite(FF[i])) throw new RangeError('Block ' + (i + 1) + ': external force must be a finite number.');
+      if (!isFinite(LL[i]) || LL[i] < 0) throw new RangeError('Interface ' + (i + 1) + ': fmax must be a non-negative number.');
+      if (!isFinite(KK[i]) || KK[i] < 0) throw new RangeError('Interface ' + (i + 1) + ': fkin must be a non-negative number.');
+      if (KK[i] > LL[i]) {
+        if (KK[i] - LL[i] > 1e-12 * (1 + LL[i])) throw new RangeError('Interface ' + (i + 1) + ': the kinetic friction (mu_k) cannot be larger than the static limit (mu_s).');
+        KK[i] = LL[i];                                       // rounding noise only
+      }
+      if (KK[i] !== LL[i]) differs = true;
+    }
+    return { n: n, m: M, F: FF, f: LL, k: KK, differs: differs };
+  }
+
+  // ----------------------------------------------------------------------- solver
+
+  /**
+   * Runs the Top-Down Cascade Method (and, with { repair: true }, the Phase 5 re-join).
+   *
+   * result.acceleration[i-1]   acceleration of block i (m/s^2)
+   * result.groups              [{ from, to, acceleration }]  blocks that move together
+   *                            (every block belongs to exactly one group; singletons included)
+   * result.interfaceState[i-1] 'slip' | 'stick'   for the interface below block i
+   * result.interfaceForce[i-1] friction force on block i from the interface below it (N)
+   * result.interfaceOrigin[i-1] 'yield' (slips because Phase 2 found |D| > f), 'fracture' (Phase 4
+   *                            split it), 'repair' (Phase 5 made it slip) or 'stick'
+   * result.stats               { blocks, groupsFormed, singleSlips, fractures, restingGroup,
+   *                              repairs, repairConverged, elapsedMs }
+   *                            (groupsFormed, singleSlips and fractures count what Phases 2-4 did;
+   *                            repairs counts the changes made by Phase 5)
+   * result.trace               step-by-step log (only when options.trace is true)
+   */
+  function solve(input, options) {
+    var opt = mergeOptions(options);
+    var t0 = nowMs();
+    var data = normalizeInput(input);
+    var n = data.n, m = data.m, F = data.F, f = data.f, kin = data.k, tol = opt.tolerance;
+    var split = data.differs;                    // true when some interface has mu_k < mu_s
+    var fname = split ? 'fs' : 'f';              // how the static limit is named in the log
+
+    var trace = opt.trace ? [] : null;
+    function log(s) { trace.push(s); }
+    if (trace && split) {
+      log('Test with the static limit fs, push with the kinetic friction fk: an interface yields only when ' +
+          'the force it must supply exceeds fs, and once it slips it exerts only fk.');
+    }
+
+    // Prefix sums so that any block range [a..b] has its mass and external force in O(1).
+    // PM[k] = m[0] + ... + m[k-1],  PF[k] = F[0] + ... + F[k-1]
+    var PM = new Float64Array(n + 1), PF = new Float64Array(n + 1), i;
+    for (i = 0; i < n; i++) { PM[i + 1] = PM[i] + m[i]; PF[i + 1] = PF[i] + F[i]; }
+
+    var acc = new Float64Array(n);   // final acceleration of each block
+    var R = new Float64Array(n);     // R[i]: force on block i from the interface below it
+    var state = new Array(n);        // 'slip' | 'stick' for the interface below each block
+    var origin = new Array(n);       // 'yield' (Phase 2) | 'fracture' (Phase 4) | 'repair' (Phase 5) | 'stick'
+    var sl = new Int8Array(n);       // sense of sliding of a slipping interface: sign of (a_i - a_(i+1)); 0 = sticks
+    var stats = { blocks: n, groupsFormed: 0, singleSlips: 0, fractures: 0, restingGroup: null,
+                  repairs: 0, repairConverged: true, elapsedMs: 0 };
+
+    // ---------------------------------------------------------------- Phase 4
+    // Resolve a group of blocks [a0..b0] that has just been found to slide.
+    //   T : known force on the top block from above  (the carried-in force C)
+    //   B : known force on the bottom block from below (kinetic friction of its interface)
+    // The group is first assumed rigid. Each internal interface is then asked whether
+    // it can supply the force that this shared acceleration requires of it. The question
+    // is put to the STATIC limit f. At the first interface (from the bottom) that cannot
+    // supply it, the group fractures into an upper and a lower fragment, and both fragments
+    // go through the same procedure again.
+    function resolveFragments(a0, b0, T0, B0) {
+      var stack = [a0, b0, T0, B0];            // flat stack of (a, b, T, B) tuples
+      while (stack.length) {
+        var B = stack.pop(), T = stack.pop(), b = stack.pop(), a = stack.pop();
+
+        // A fragment of one block has no internal interface: Equation (2), a = (T + F + B) / m.
+        if (a === b) {
+          acc[a] = (T + F[a] + B) / m[a];
+          R[a] = B;
+          if (trace) {
+            log('  Block ' + (a + 1) + ' alone: top ' + fmt(T) + ' N, external ' + fmt(F[a]) +
+                ' N, bottom ' + fmt(B) + ' N  ->  a = ' + fmt(acc[a]) + ' m/s^2');
+          }
+          continue;
+        }
+
+        // Equation (3): acceleration of the whole group if it stays rigid.
+        var M = PM[b + 1] - PM[a];
+        var accRigid = (T + (PF[b + 1] - PF[a]) + B) / M;
+        if (trace) {
+          log('  Group ' + (a + 1) + '-' + (b + 1) + ' (mass ' + M + ' kg): top ' + fmt(T) +
+              ' N, bottom ' + fmt(B) + ' N  ->  a0 = ' + fmt(accRigid) + ' m/s^2');
+        }
+
+        // Equation (4): scan internal interfaces from the bottom (q-1) up to the top (p).
+        var jStar = -1, reqStar = 0, j, req;
+        for (j = b - 1; j >= a; j--) {
+          req = (PM[j + 1] - PM[a]) * accRigid - (T + (PF[j + 1] - PF[a]));
+          if (Math.abs(req) > f[j] + tol) { jStar = j; reqStar = req; break; }
+          if (trace) {
+            log('    interface ' + (j + 1) + ': F_req = ' + fmt(req) + ' N, ' + fname + ' = ' + mag(f[j]) + ' N  ->  holds');
+          }
+        }
+
+        if (jStar < 0) {
+          // Every internal interface holds: the whole group moves together at a0.
+          for (j = a; j < b; j++) {
+            R[j] = (PM[j + 1] - PM[a]) * accRigid - (T + (PF[j + 1] - PF[a]));
+            state[j] = 'stick'; origin[j] = 'stick';
+          }
+          for (j = a; j <= b; j++) acc[j] = accRigid;
+          R[b] = B;
+          if (trace) log('  -> blocks ' + (a + 1) + '-' + (b + 1) + ' move together at ' + fmt(accRigid) + ' m/s^2');
+          continue;
+        }
+
+        // Fracture at interface jStar. It cannot supply F_req, so it slips and exerts its
+        // KINETIC friction on the upper fragment, in the direction of the force it failed to
+        // supply. For a group built by Phase 2 this direction is always sgn(a0), the direction
+        // in which the lower fragment drags the upper one, as in every step of the worked
+        // solution (the interface cannot fail with the opposite sign, because Phase 2 has
+        // already shown |D_j| <= f_j).
+        var dir = sgn(reqStar);
+        var Rj = kin[jStar] * dir;               // force on the upper fragment from below
+        state[jStar] = 'slip';
+        origin[jStar] = 'fracture';
+        R[jStar] = Rj;
+        sl[jStar] = -dir;                        // the lower fragment drags the upper one: a_upper < a_lower
+        stats.fractures++;
+        if (trace) {
+          log('    interface ' + (jStar + 1) + ': F_req = ' + fmt(reqStar) + ' N, ' + fname + ' = ' + mag(f[jStar]) +
+              (split ? ' N  ->  FAILS, and a slipping interface exerts only fk = ' + mag(kin[jStar]) + ' N. Fracture: upper '
+                     : ' N  ->  FAILS. Fracture: upper ') +
+              part(a, jStar) + ' gets ' + fmt(Rj) +
+              ' N from below, lower ' + part(jStar + 1, b) + ' gets ' + fmt(-Rj) + ' N from above');
+        }
+        stack.push(jStar + 1, b, -Rj, B);        // lower fragment (resolved after the upper one)
+        stack.push(a, jStar, T, Rj);             // upper fragment
+      }
+    }
+
+    // A group that reaches the floor and still holds is at rest. With a = 0 the force each
+    // interface supplies is just the balance of everything above it.
+    function restingGroup(p, q, C) {
+      for (var k = p; k <= q; k++) {
+        acc[k] = 0;
+        R[k] = -(C + (PF[k + 1] - PF[p]));
+        state[k] = 'stick'; origin[k] = 'stick';
+      }
+      stats.restingGroup = { from: p + 1, to: q + 1 };
+      if (trace) log('Blocks ' + (p + 1) + '-' + (q + 1) + ' hold against the floor: all at rest (a = 0).');
+    }
+
+    // ---------------------------------------------------------------- Phase 5
+    // Re-join. Phases 2-4 fix the sliding sense of every interface that yields from the drive at
+    // that moment; the final accelerations can contradict it. The whole outcome is described by
+    // the pattern sl[] (0 = sticks, +1 / -1 = slips with a_i - a_(i+1) > 0 / < 0), so we
+    //   1. solve the pattern: stuck blocks move rigidly, a slipping interface pushes with k,
+    //   2. make every interface whose relative acceleration has the wrong sign stick (worst first),
+    //   3. let the stuck interface that is most overloaded (|force needed| / static limit) slip,
+    // and repeat until nothing is left to repair.
+    function solvePattern() {
+      var p = 0, k;
+      for (var q = 0; q < n; q++) {
+        var slipHere = sl[q] !== 0;
+        if (!slipHere && q < n - 1) continue;               // the cluster continues below
+        var T = p > 0 ? kin[p - 1] * sl[p - 1] : 0;         // force from the slipping interface above
+        var Mg = PM[q + 1] - PM[p], Fg = PF[q + 1] - PF[p], ac, Bq;
+        if (slipHere) { Bq = -kin[q] * sl[q]; ac = (T + Fg + Bq) / Mg; }
+        else { ac = 0; Bq = -(T + Fg); }                    // the cluster is held by the floor
+        R[q] = Bq;
+        for (k = p; k <= q; k++) acc[k] = ac;
+        for (k = p; k < q; k++) R[k] = (PM[k + 1] - PM[p]) * ac - (T + (PF[k + 1] - PF[p]));
+        p = q + 1;
+      }
+    }
+
+    function rejoin() {
+      var cap = 50 * n + 50, steps = 0, j;
+      for (;;) {
+        solvePattern();
+
+        // (a) A slipping interface whose relative acceleration has the wrong sign (or none) cannot
+        //     be slipping that way: it holds, and its two groups re-join.
+        var worst = -1, worstV = 0;
+        for (j = 0; j < n; j++) {
+          if (sl[j] === 0) continue;
+          var lo = j < n - 1 ? acc[j + 1] : 0;
+          var bad = -(sl[j] * (acc[j] - lo));
+          var sc = 1e-9 * (1 + Math.abs(acc[j]) + Math.abs(lo));
+          if (bad >= -sc && (worst < 0 || bad > worstV)) { worst = j; worstV = bad; }
+        }
+        if (worst >= 0) {
+          if (trace) {
+            log('Phase 5: interface ' + (worst + 1) + ' is not slipping the way the cascade assumed (block ' + (worst + 1) +
+                ' ' + fmt(acc[worst]) + ', ' + (worst < n - 1 ? 'block ' + (worst + 2) : 'the floor') + ' ' +
+                fmt(worst < n - 1 ? acc[worst + 1] : 0) + ' m/s^2). It holds, so the two groups re-join.');
+          }
+          sl[worst] = 0; state[worst] = 'stick'; origin[worst] = 'stick';
+          stats.repairs++;
+          if (++steps > cap) { stats.repairConverged = false; break; }
+          continue;
+        }
+
+        // (b) A stuck interface that has to supply more than its static limit cannot hold: it slips.
+        var best = -1, bestKey = 0;
+        for (j = 0; j < n; j++) {
+          if (sl[j] !== 0) continue;
+          var load = Math.abs(R[j]);
+          if (!(load > f[j] + tol)) continue;
+          var key = f[j] > 0 ? load / f[j] : Infinity;
+          if (best < 0 || key > bestKey) { best = j; bestKey = key; }
+        }
+        if (best < 0) break;                                // every interface obeys its friction law
+        if (trace) {
+          log('Phase 5: interface ' + (best + 1) + ' now has to supply ' + fmt(R[best]) + ' N but can hold only ' +
+              mag(f[best]) + ' N. It slips' + (split ? ' and exerts fk = ' + mag(kin[best]) + ' N.' : '.'));
+        }
+        sl[best] = R[best] > 0 ? -1 : 1;                    // R > 0: the lower part drags the upper one
+        state[best] = 'slip'; origin[best] = 'repair';
+        stats.repairs++;
+        if (++steps > cap) { stats.repairConverged = false; break; }
+      }
+      solvePattern();                                       // arrays now match the final pattern
+      for (j = 0; j < n; j++) state[j] = sl[j] !== 0 ? 'slip' : 'stick';
+      stats.restingGroup = null;
+      if (sl[n - 1] === 0) {
+        var st = n - 1;
+        while (st > 0 && sl[st - 1] === 0) st--;
+        stats.restingGroup = { from: st + 1, to: n };
+      }
+      if (trace) {
+        log(stats.repairs === 0 ? 'Phase 5: every interface already obeys its friction law, nothing to repair.'
+            : 'Phase 5: ' + stats.repairs + ' repair step' + (stats.repairs === 1 ? '' : 's') + ', every interface now obeys its friction law' +
+              (stats.repairConverged ? '.' : ' (the repair did NOT converge: check the physical check below).'));
+      }
+    }
+
+    // ------------------------------------------------------- Phase 2 and Phase 3
+    // p : first block of the group being built      C : force carried in from above
+    // The group [p..q] grows one block at a time; D is its drive.
+    var p = 0, C = 0;
+    for (var q = 0; q < n; q++) {
+      var D = C + (PF[q + 1] - PF[p]);                       // Equation (1)
+
+      if (Math.abs(D) <= f[q] + tol) {                       // Phase 2: the interface holds (static limit)
+        if (trace) {
+          log('Block ' + (q + 1) + ': D = ' + fmt(D) + ' N, ' + fname + (q + 1) + ' = ' + mag(f[q]) +
+              ' N  ->  holds' + (q < n - 1 ? ', block ' + (q + 2) + ' joins the group' : ''));
+        }
+        if (q === n - 1) restingGroup(p, q, C);              // reached the floor and holds
+        continue;
+      }
+
+      // Phase 2: the interface yields. The group [p..q] slides in the direction of D.
+      var dir = sgn(D);
+      var bottom = -kin[q] * dir;                            // kinetic friction opposes the motion
+      state[q] = 'slip';
+      origin[q] = 'yield';
+      R[q] = bottom;
+      sl[q] = dir;                                           // the group above slides ahead of what is below
+      if (p < q) stats.groupsFormed++; else stats.singleSlips++;
+      if (trace) {
+        log('Block ' + (q + 1) + ': D = ' + fmt(D) + ' N, ' + fname + (q + 1) + ' = ' + mag(f[q]) +
+            (split ? ' N  ->  |D| > fs, interface ' + (q + 1) + ' yields and now exerts fk' + (q + 1) + ' = ' + mag(kin[q]) + ' N'
+                   : ' N  ->  |D| > f, interface ' + (q + 1) + ' yields') +
+            (p < q ? ' (group ' + (p + 1) + '-' + (q + 1) + ')' : ''));
+      }
+
+      resolveFragments(p, q, C, bottom);                     // Phase 3 (single block) / Phase 4 (group)
+
+      // Phase 3: the slipping interface drags the next block with its kinetic friction,
+      // in the direction of sliding. It becomes the carried-in force of the next group.
+      C = kin[q] * dir;
+      p = q + 1;
+      if (trace && q < n - 1) log('  transmits ' + fmt(C) + ' N to block ' + (q + 2));
+    }
+
+    if (opt.repair) rejoin();                                // Phase 5
+
+    // ------------------------------------------------------------------ outputs
+    var groups = [], start = 0;
+    for (i = 0; i < n; i++) {
+      if (i === n - 1 || state[i] !== 'stick') {
+        groups.push({ from: start + 1, to: i + 1, acceleration: acc[start] });
+        start = i + 1;
+      }
+    }
+
+    stats.elapsedMs = nowMs() - t0;
+    var result = {
+      n: n,
+      acceleration: Array.prototype.slice.call(acc),
+      groups: groups,
+      interfaceState: state.slice(),
+      interfaceOrigin: origin.slice(),
+      interfaceForce: Array.prototype.slice.call(R),
+      stats: stats
+    };
+    if (trace) result.trace = trace;
+    if (opt.validate) result.validation = validate(input, result);
+    return result;
+  }
+
+  // ------------------------------------------------------------------- validator
+
+  /**
+   * Independent physical check of a result. It does not repeat the method; it asks
+   * whether the answer obeys the laws the method relies on:
+   *   - Newton's second law holds for every block,
+   *   - every sticking interface carries no more than its limit and joins blocks with equal acceleration,
+   *   - every slipping interface exerts exactly its kinetic friction (its limit when mu_k = mu_s), and
+   *     that friction opposes the relative motion of the two blocks (the assumption behind the heuristic).
+   * Returns { ok, maxResidual, violations: [{ type, block|interface, detail }] }.
+   */
+  function validate(input, result, options) {
+    var d = normalizeInput(input);
+    var n = d.n, m = d.m, F = d.F, f = d.f, kk = d.k;
+    var rel = (options && options.tolerance) || 1e-7;
+    var a = result.acceleration, R = result.interfaceForce, S = result.interfaceState;
+    var violations = [], maxResidual = 0, i;
+
+    for (i = 0; i < n; i++) {
+      var fromAbove = i > 0 ? -R[i - 1] : 0;
+      var sum = F[i] + fromAbove + R[i];
+      var res = Math.abs(m[i] * a[i] - sum);
+      var scale = 1 + Math.abs(m[i] * a[i]) + Math.abs(F[i]) + Math.abs(fromAbove) + Math.abs(R[i]);
+      if (res > maxResidual) maxResidual = res;
+      if (res > rel * scale) {
+        violations.push({ type: 'newton', block: i + 1, detail: 'm*a differs from the net force by ' + res.toExponential(2) + ' N' });
+      }
+    }
+
+    for (i = 0; i < n; i++) {
+      var below = i < n - 1 ? a[i + 1] : 0;              // the floor does not move
+      var relAcc = a[i] - below;
+      var sc = 1 + Math.abs(f[i]) + Math.abs(R[i]);
+      if (S[i] === 'stick') {
+        if (Math.abs(R[i]) > f[i] + rel * sc) {
+          violations.push({ type: 'friction-limit', interface: i + 1, detail: 'sticking interface carries ' + R[i].toFixed(3) + ' N, limit ' + f[i].toFixed(3) + ' N' });
+        }
+        if (Math.abs(relAcc) > rel * (1 + Math.abs(a[i]))) {
+          violations.push({ type: 'stick-motion', interface: i + 1, detail: 'blocks joined by a sticking interface accelerate differently' });
+        }
+      } else {
+        if (Math.abs(Math.abs(R[i]) - kk[i]) > rel * sc) {
+          violations.push({ type: 'kinetic-magnitude', interface: i + 1, detail: 'slipping interface does not exert its ' + (d.differs ? 'kinetic' : 'limiting') + ' friction' });
+        }
+        if (Math.abs(relAcc) > rel * (1 + Math.abs(a[i])) && R[i] * relAcc > rel * sc) {
+          violations.push({
+            type: 'slip-direction', interface: i + 1,
+            detail: 'friction (' + fmt(R[i]) + ' N on the upper block) does not oppose the relative acceleration (' + fmt(relAcc) + ' m/s^2)'
+          });
+        }
+      }
+    }
+    return { ok: violations.length === 0, maxResidual: maxResidual, violations: violations };
+  }
+
+  // ----------------------------------------------------------------- presentation
+
+  /** Plain-text table of the result: one row per group of blocks, like Table 2 of the paper. */
+  function formatTable(result, decimals) {
+    decimals = (decimals === undefined) ? 2 : decimals;
+    var lines = ['Block(s)       Acceleration (m/s^2)   State', '-------------------------------------------------'];
+    result.groups.forEach(function (g) {
+      var label = g.from === g.to ? String(g.from) : g.from + '-' + g.to;
+      lines.push(pad(label, 14) + pad(fmt(g.acceleration, decimals), 22) + (g.from === g.to ? 'independent' : 'move together'));
+    });
+    return lines.join('\n');
+  }
+
+  function pad(s, w) { s = String(s); while (s.length < w) s += ' '; return s; }
+
+  return {
+    solve: solve,
+    validate: validate,
+    computeLimits: computeLimits,
+    formatTable: formatTable,
+    version: '2.0.0'
+  };
+});
+
+</script>
+
+<script>
+(function () {
+  var SSC = window.SlipSplitCalculate;
+  var $ = function (id) { return document.getElementById(id); };
+  var lastResult = null, lastInput = null, lastRepair = false, timings = null, bench = null;
+  var runLog = [], runCount = 0, benchRunning = false, benchStale = true, benchToken = 0;
+
+  // ---- how finely this browser can measure time -------------------------------------------
+  function timerResolution() {
+    var best = Infinity;
+    for (var i = 0; i < 300; i++) {
+      var a = performance.now(), b = a, guard = 0;
+      while (b === a && guard++ < 2e6) b = performance.now();
+      if (b > a && b - a < best) best = b - a;
+    }
+    return best === Infinity ? 0.1 : Math.max(best, 0.001);
+  }
+  var RES = timerResolution();
+
+  function fmtTime(ms) {
+    if (ms >= 1000) return (ms / 1000).toFixed(2) + ' s';
+    if (ms >= 10) return ms.toFixed(1) + ' ms';
+    if (ms >= 1) return ms.toFixed(2) + ' ms';
+    var us = ms * 1000;
+    if (us >= 100) return us.toFixed(0) + ' \u00B5s';
+    if (us >= 1) return us.toFixed(1) + ' \u00B5s';
+    return '< 1 \u00B5s';
+  }
+  function resText() { return RES >= 1 ? RES.toFixed(0) + ' ms' : (RES >= 0.1 ? RES.toFixed(1) + ' ms' : (RES * 1000).toFixed(0) + ' \u00B5s'); }
+  function single(ms) { return ms < RES * 1.5 ? '< ' + resText() : fmtTime(ms); }
+  function fmt(x) { return (x >= 0 ? '+' : '\u2212') + Math.abs(x).toFixed(2); }
+
+  // ---- data ---------------------------------------------------------------------------------
+  var EX_M = [12,3,2,13,6,5,5,4,13,3,12,13,10,3,11,8,2,2,3,5,5,10,11,2,10,5,13,12,13,10];
+  var EX_F = [3000,0,0,0,0,-2000,0,1500,-2000,0,2000,0,0,-1500,2500,0,0,0,-2000,0,0,0,2500,0,0,-2500,0,0,0,2500];
+  var EX_L = [58.8,61.5,100.3,105.0,151.2,217.3,207.0,270.0,270.9,316.8,171.6,263.9,323.2,239.2,333.5,295.2,387.5,571.5,455.0,472.5,392.0,465.0,917.7,749.8,761.2,480.6,935.9,548.1,756.0,1356.0];
+  // The same 30 blocks for Advanced mode: EX_MUS are the coefficients EX_L was built from, EX_MUK are 80 % of them.
+  var EX_MUS = [0.49,0.41,0.59,0.35,0.42,0.53,0.45,0.54,0.43,0.48,0.22,0.29,0.32,0.23,0.29,0.24,0.31,0.45,0.35,0.35,0.28,0.31,0.57,0.46,0.44,0.27,0.49,0.27,0.35,0.6];
+  var EX_MUK = [0.39,0.33,0.47,0.28,0.34,0.42,0.36,0.43,0.34,0.38,0.18,0.23,0.26,0.18,0.23,0.19,0.25,0.36,0.28,0.28,0.22,0.25,0.46,0.37,0.35,0.22,0.39,0.22,0.28,0.48];
+
+  // ---- which friction model is on screen ------------------------------------------------------------
+  // 'std': one friction number per block (mu_s = mu_k).   'adv': separate mu_s and mu_k for every block.
+  var kind = 'std';
+  function nCols() { return kind === 'adv' ? 4 : 3; }
+  function colLabels() {
+    return kind === 'adv' ? ['mass in kilograms', 'external force in newtons', 'static friction coefficient', 'kinetic friction coefficient']
+                          : ['mass in kilograms', 'external force in newtons', 'frictional force'];
+  }
+  var HINT_STD = 'Fill one row per block. Rightward force is positive; leave <b>External force</b> empty for 0. The frictional force f is the limit of the surface <b>directly below</b> that block (the last block rests on the floor). You can also paste rows copied from a spreadsheet into any cell.';
+  var HINT_ADV = 'Fill one row per block. Rightward force is positive; leave <b>External force</b> empty for 0. &mu;s and &mu;k belong to the surface <b>directly below</b> that block (the last block rests on the floor): &mu;s decides whether it starts to slip, &mu;k is its friction once it does (&mu;k cannot exceed &mu;s). You can also paste rows (mass, force, &mu;s, &mu;k) copied from a spreadsheet into any cell.';
+  var MUHINT_STD = 'With &mu;, each limit is computed as f = &mu; &middot; g &middot; (total mass of that block and every block above it).';
+  var MUHINT_ADV = 'Every surface gets two limits: fs = &mu;s &middot; g &middot; M, which decides whether it slips, and fk = &mu;k &middot; g &middot; M, its friction once it slips. M is the total mass of that block and every block above it.';
+
+  // ---- the input grid -------------------------------------------------------------------------------
+  var grid = $('grid');
+
+  function rowHTML(i, vals) {
+    var what = colLabels(), h = '<tr><td class="idx">' + i + '</td>';
+    for (var k = 0; k < nCols(); k++) {
+      var x = vals ? vals[k] : '';
+      h += '<td><input type="number" step="any"' + (k === 1 ? '' : ' min="0" inputmode="decimal"') + ' enterkeyhint="next" data-c="' + k +
+           '" aria-label="Block ' + i + ' ' + what[k] + '" value="' + ((x === undefined || x === null) ? '' : x) + '"></td>';
+    }
+    return h + '<td><button class="del" type="button" aria-label="Remove block ' + i + '">\u00D7</button></td></tr>';
+  }
+
+  function rowCount() { return grid.rows.length; }
+  function syncCount() { $('count').value = rowCount(); }
+
+  function renumber() {
+    var what = colLabels();
+    for (var i = 0; i < grid.rows.length; i++) {
+      var r = grid.rows[i], n = i + 1;
+      r.cells[0].textContent = n;
+      var inp = r.querySelectorAll('input');
+      for (var k = 0; k < inp.length; k++) inp[k].setAttribute('aria-label', 'Block ' + n + ' ' + what[k]);
+      r.querySelector('.del').setAttribute('aria-label', 'Remove block ' + n);
+    }
+    syncCount();
+  }
+
+  // Replace the whole grid with the given columns (arrays may be shorter than n: the rest stays empty).
+  //   cols = [mass[], force[], friction[]]   or, in Advanced mode,   [mass[], force[], muS[], muK[]]
+  function fillGrid(n, cols) {
+    var html = [];
+    for (var i = 0; i < n; i++) {
+      var vals = [];
+      for (var k = 0; k < nCols(); k++) vals.push(cols && cols[k] ? cols[k][i] : '');
+      html.push(rowHTML(i + 1, vals));
+    }
+    grid.innerHTML = html.join('');
+    syncCount();
+  }
+
+  function setRows(n) {
+    n = Math.max(1, Math.min(5000, Math.floor(n) || 1));
+    var cur = rowCount();
+    if (n > cur) {
+      var html = [];
+      for (var i = cur; i < n; i++) html.push(rowHTML(i + 1, null));
+      grid.insertAdjacentHTML('beforeend', html.join(''));
+    } else {
+      while (rowCount() > n) grid.deleteRow(rowCount() - 1);
+    }
+    syncCount();
+  }
+
+  function buildHead() {
+    var adv = kind === 'adv', mu = $('mode').value === 'mu';
+    $('inp-head').innerHTML = '<th class="c-idx">Block</th><th>Mass<br><small>(kg)</small></th><th>External force<br><small>(N)</small></th>' +
+      (adv ? '<th>&mu;s<br><small>static</small></th><th>&mu;k<br><small>kinetic</small></th>'
+           : '<th>' + (mu ? 'Friction coefficient &mu;<br><small>(no unit)</small>' : 'Frictional force f<br><small>(N)</small>') + '</th>') +
+      '<th class="c-del"></th>';
+    $('inp-table').classList.toggle('adv', adv);
+  }
+
+  function applyKindUI() {
+    var adv = kind === 'adv', mu = $('mode').value === 'mu';
+    $('lbl-mode').hidden = adv; $('mode').hidden = adv;
+    $('gwrap').hidden = !(adv || mu);
+    $('muhint').hidden = !(adv || mu);
+    $('muhint').innerHTML = adv ? MUHINT_ADV : MUHINT_STD;
+    $('hint-main').innerHTML = adv ? HINT_ADV : HINT_STD;
+    $('adv-info').hidden = !adv;
+    $('btn-small').hidden = !adv;
+    var bs = $('kind').querySelectorAll('button');
+    for (var i = 0; i < bs.length; i++) {
+      var on = bs[i].getAttribute('data-kind') === kind;
+      bs[i].classList.toggle('on', on); bs[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+    buildHead();
+  }
+
+  function setMode(mode) { $('mode').value = mode; applyKindUI(); }
+
+  // Switch between Standard and Advanced. Mass and force stay. A plain coefficient mu carries over as
+  // mu_s = mu_k (edit mu_k afterwards); limiting forces cannot be converted, so that column starts empty.
+  function setKind(k) {
+    if (k === kind) return;
+    var n = rowCount(), M = [], Fv = [], L = [], i;
+    var carry = kind === 'std' && $('mode').value === 'mu';
+    for (i = 0; i < n; i++) {
+      var inp = grid.rows[i].querySelectorAll('input');
+      M.push(inp[0].value); Fv.push(inp[1].value); L.push(inp[2].value);
+    }
+    kind = k;
+    var cols = [M, Fv];
+    if (kind === 'adv') { var base = carry ? L : []; cols.push(base, base); } else cols.push([]);
+    applyKindUI();
+    fillGrid(n, cols);
+    $('err').hidden = true; $('out').hidden = true;
+  }
+
+  function loadExample() {
+    if (kind === 'adv') { $('g').value = 10; fillGrid(EX_M.length, [EX_M, EX_F, EX_MUS, EX_MUK]); }
+    else { setMode('fmax'); fillGrid(EX_M.length, [EX_M, EX_F, EX_L]); }
+    run();
+  }
+
+  // Three blocks (top to bottom: 2, 3 and 5 kg), a 60 N push on the middle one, g = 10 m/s^2.
+  function loadSmall() {
+    $('g').value = 10;
+    fillGrid(3, [[2, 3, 5], [0, 60, 0], [0.5, 0.4, 0.3], [0.4, 0.3, 0.2]]);
+    run();
+  }
+
+  function loadRandom() {
+    var n = 500, m = [], F = [], mu = [], i;
+    for (i = 0; i < n; i++) {
+      m.push(2 + Math.floor(Math.random() * 12));
+      F.push(Math.random() < 0.3 ? (Math.random() < 0.5 ? -1 : 1) * 500 * (3 + Math.floor(Math.random() * 4)) : 0);
+      mu.push(0.3 + Math.random() * 0.3);
+    }
+    if (kind === 'adv') {
+      var ms = mu.map(function (x) { return Math.round(x * 100) / 100; });
+      var mk = ms.map(function (x) { return Math.round(x * (0.6 + Math.random() * 0.4) * 100) / 100; });
+      $('g').value = 10;
+      fillGrid(n, [m, F, ms, mk]);
+    } else {
+      var f = SSC.computeLimits(m, mu, 10).map(function (x) { return Math.round(x * 10) / 10; });
+      setMode('fmax');
+      fillGrid(n, [m, F, f]);
+    }
+    run();
+  }
+
+  // Paste rows from a spreadsheet or a CSV into the grid, starting at the cell you pasted into.
+  grid.addEventListener('paste', function (e) {
+    var el = e.target;
+    if (!el || el.tagName !== 'INPUT') return;
+    var text = (e.clipboardData || window.clipboardData).getData('text');
+    if (!/[\n\t,;]/.test(text.trim())) return;               // a single value: let the browser paste normally
+    e.preventDefault();
+    var rows = text.replace(/\r/g, '').split('\n')
+      .filter(function (l) { return l.trim() !== '' && l.trim().charAt(0) !== '#'; })
+      .map(function (line) {
+        return (line.indexOf('\t') >= 0 ? line.split('\t') : line.trim().split(/\s*[,;]\s*|\s+/)).map(function (s) { return s.trim(); });
+      })
+      .filter(function (cells) {                                   // drop a header line such as "mass, force, f"
+        var words = cells.some(function (s) { return /[A-Za-z]/.test(s) && isNaN(Number(s)); });
+        return !words;
+      });
+    if (!rows.length) return;
+    var r0 = el.closest('tr').rowIndex - 1, c0 = Number(el.getAttribute('data-c'));
+    if (r0 + rows.length > rowCount()) setRows(r0 + rows.length);
+    rows.forEach(function (cells, li) {
+      var inputs = grid.rows[r0 + li].querySelectorAll('input');
+      for (var k = 0; k < cells.length && c0 + k < nCols(); k++) inputs[c0 + k].value = cells[k];
+    });
+    clearBad();
+  });
+
+  grid.addEventListener('click', function (e) {
+    var btn = e.target.closest('button.del');
+    if (!btn) return;
+    grid.deleteRow(btn.closest('tr').rowIndex - 1);
+    if (!rowCount()) setRows(1);
+    renumber();
+  });
+
+  // Enter moves down the same column, like a spreadsheet (and adds a row at the bottom).
+  grid.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+    e.preventDefault();
+    var tr = e.target.closest('tr'), c = e.target.getAttribute('data-c');
+    if (!tr.nextElementSibling) setRows(rowCount() + 1);
+    tr.nextElementSibling.querySelector('input[data-c="' + c + '"]').focus();
+  });
+  grid.addEventListener('input', function (e) { if (e.target.classList) e.target.classList.remove('bad'); });
+
+  function clearBad() { grid.querySelectorAll('input.bad').forEach(function (x) { x.classList.remove('bad'); }); }
+
+  // Read the grid. Empty external force means 0; any other empty or invalid cell is reported.
+  function parse() {
+    var adv = kind === 'adv', mode = $('mode').value, g = parseFloat($('g').value);
+    var m = [], F = [], c = [], c2 = [], first = null, msg = '';
+    clearBad();
+    function bad(input, text) { input.classList.add('bad'); if (!first) { first = input; msg = text; } }
+    for (var i = 0; i < grid.rows.length; i++) {
+      var inp = grid.rows[i].querySelectorAll('input'), n = i + 1;
+      var sm = inp[0].value.trim(), sF = inp[1].value.trim(), sf = inp[2].value.trim();
+      var vm = Number(sm), vF = sF === '' ? 0 : Number(sF), vf = Number(sf), vk = 0;
+      if (sm === '' || !(vm > 0)) bad(inp[0], 'Block ' + n + ': enter a mass greater than 0.');
+      if (isNaN(vF)) bad(inp[1], 'Block ' + n + ': external force must be a number.');
+      if (adv) {
+        var sk = inp[3].value.trim();
+        vk = Number(sk);
+        var okS = !(sf === '' || isNaN(vf) || vf < 0), okK = !(sk === '' || isNaN(vk) || vk < 0);
+        if (!okS) bad(inp[2], 'Block ' + n + ': enter the static coefficient \u03BCs (0 or more).');
+        if (!okK) bad(inp[3], 'Block ' + n + ': enter the kinetic coefficient \u03BCk (0 or more).');
+        else if (okS && vk > vf) bad(inp[3], 'Block ' + n + ': \u03BCk cannot be larger than \u03BCs.');
+      } else if (sf === '' || isNaN(vf) || vf < 0) {
+        bad(inp[2], 'Block ' + n + ': enter the ' + (mode === 'mu' ? 'friction coefficient (0 or more).' : 'frictional force (0 or more).'));
+      }
+      m.push(vm); F.push(vF); c.push(vf); c2.push(vk);
+    }
+    if (first) { first.scrollIntoView({ block: 'center' }); first.focus(); throw new Error(msg); }
+    if ((adv || mode === 'mu') && !(g > 0)) throw new Error('g must be a positive number.');
+    if (adv) return { mass: m, force: F, fmax: SSC.computeLimits(m, c, g), fkin: SSC.computeLimits(m, c2, g) };
+    return { mass: m, force: F, fmax: mode === 'mu' ? SSC.computeLimits(m, c, g) : c };
+  }
+
+  // ---- run once, timing every stage -----------------------------------------------------------
+  function showError(e) {
+    $('err').textContent = e.message; $('err').hidden = false; $('out').hidden = true;
+  }
+
+  function run() {
+    $('err').hidden = true;
+    var input, r, v = null;
+    var tA = performance.now();
+    try { input = parse(); } catch (e) { return showError(e); }
+    var tB = performance.now();
+    var ropt = { trace: $('opt-trace').checked, repair: kind === 'adv' };         // Advanced mode also runs Phase 5 (re-join)
+    try { r = SSC.solve(input, ropt); } catch (e) { return showError(e); }
+    var tC = performance.now();
+    lastRepair = ropt.repair;
+    if ($('opt-check').checked) v = SSC.validate(input, r);
+    var tD = performance.now();
+    renderResults(r, v);
+    var tE = performance.now();
+
+    lastResult = r; lastInput = input; benchToken++; bench = null; benchStale = true; benchRunning = false;
+    timings = { n: r.n, parse: tB - tA, solve: tC - tB, check: v ? tD - tC : null, show: tE - tD, total: tE - tA };
+    runCount++;
+    runLog.unshift({ id: runCount, n: r.n, solve: timings.solve, total: timings.total });
+    if (runLog.length > 8) runLog.length = 8;
+
+    $('out').hidden = false;
+    renderTiming();
+    if ($('p-timing').classList.contains('active')) startBench();
+    $('out').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function renderResults(r, v) {
+    var s = r.stats;
+    var chips = [r.n + ' blocks', s.groupsFormed + ' groups formed', s.fractures + ' fractures', s.singleSlips + ' slipped alone'];
+    if (s.repairs) chips.push(s.repairs + ' re-join step' + (s.repairs === 1 ? '' : 's'));
+    if (s.restingGroup) chips.push((s.restingGroup.from === s.restingGroup.to ? 'block ' + s.restingGroup.from : 'blocks ' + s.restingGroup.from + '\u2013' + s.restingGroup.to) + ' at rest on the floor');
+    $('stats').innerHTML = chips.map(function (c) { return '<span class="chip">' + c + '</span>'; }).join('');
+
+    var html = [];
+    r.groups.forEach(function (g) {
+      var label = g.from === g.to ? g.from : g.from + '\u2013' + g.to, tog = g.to > g.from;
+      html.push('<tr><td>' + label + '</td><td>' + fmt(g.acceleration) + '</td><td' + (tog ? ' class="tog"' : '') + '>' +
+                (tog ? 'move together' : 'independent') + '</td></tr>');
+    });
+    $('rows').innerHTML = html.join('');
+
+    var box = $('check');
+    if (v) {
+      var dirs = v.violations.filter(function (x) { return x.type === 'slip-direction'; });
+      var others = v.violations.length - dirs.length;
+      box.hidden = false;
+      if (v.ok) {
+        box.className = 'note good';
+        box.textContent = 'Physical check passed: force balance, friction limits and sliding directions are all consistent with the result.' +
+          (s.repairs ? ' The re-join step (Phase 5) made ' + s.repairs + ' correction' + (s.repairs === 1 ? '' : 's') + ' to the cascade first.' : '');
+      } else {
+        box.className = 'note warn';
+        var msg = others === 0
+          ? 'Force balance and friction limits hold. At ' + dirs.length + ' interface(s) the sliding direction assumed by the method (the sign of the drive) does not match the resulting accelerations.'
+          : 'The check found ' + v.violations.length + ' inconsistency(ies).';
+        var items = v.violations.slice(0, 8).map(function (x) { return '<li>interface ' + x.interface + (x.block ? ' / block ' + x.block : '') + ': ' + x.detail + '</li>'; }).join('');
+        if (!s.repairConverged) msg += ' The re-join step (Phase 5) did not converge.';
+        box.innerHTML = msg + '<ul>' + items + (v.violations.length > 8 ? '<li>and ' + (v.violations.length - 8) + ' more</li>' : '') + '</ul>';
+      }
+    } else { box.hidden = true; }
+
+    if (r.trace) {
+      $('lognote').textContent = r.trace.length + ' lines, in the order the method takes its steps.';
+      $('log').textContent = r.trace.join('\n'); $('log').hidden = false;
+    } else {
+      $('lognote').textContent = 'Switch on \u201CStep-by-step log\u201D above and press Run to see every Phase ' + (lastRepair ? '2 to 5' : '2, 3 and 4') + ' decision here.';
+      $('log').hidden = true;
+    }
+  }
+
+  // ---- timing tab -------------------------------------------------------------------------------
+  function benchmark(input, token, progress, done) {
+    var N = 25, samples = [], bo = { repair: lastRepair };
+    function batch(k) { var s = performance.now(); for (var i = 0; i < k; i++) SSC.solve(input, bo); return performance.now() - s; }
+    for (var w = 0; w < 5; w++) SSC.solve(input, bo);                 // warm-up, so the JIT has compiled the code
+    // choose a batch size long enough to time accurately (taking the faster of two batches,
+    // because a pause can only make a batch slower, never faster)
+    var k = 1;
+    for (var g = 0; g < 60; g++) {
+      var tb = Math.min(batch(k), batch(k));
+      if (tb >= 4) break;
+      var per = Math.max(tb, RES * 0.2) / k;
+      k = Math.min(Math.max(Math.ceil(6 / per), k * 2), 1048576);
+    }
+    var step = function () {
+      if (token !== benchToken) return done(null);
+      if (samples.length >= N) {
+        samples.sort(function (a, b) { return a - b; });
+        var sum = samples.reduce(function (a, b) { return a + b; }, 0);
+        return done({ mean: sum / N, median: samples[N >> 1], min: samples[0], max: samples[N - 1], runs: k * N });
+      }
+      samples.push(batch(k) / k);
+      progress(samples.length, N);
+      setTimeout(step, 0);
+    };
+    setTimeout(step, 0);
+  }
+
+  function startBench() {
+    if (benchRunning || !lastInput) return;
+    benchRunning = true; benchStale = false;
+    var token = benchToken;
+    $('btn-bench').disabled = true;
+    $('bench-status').textContent = 'Measuring\u2026';
+    benchmark(lastInput, token, function (p, N) { $('bench-status').textContent = 'Measuring\u2026 ' + p + '/' + N; }, function (b) {
+      benchRunning = false;
+      if (token !== benchToken) return;
+      $('btn-bench').disabled = false; $('bench-status').textContent = '';
+      bench = b; renderTiming();
+    });
+  }
+
+  function renderTiming() {
+    var t = timings; if (!t) return;
+    if (bench) {
+      $('t-main').textContent = fmtTime(bench.mean);
+      $('t-sub').textContent = 'average over ' + bench.runs.toLocaleString() + ' repeated runs \u00B7 ' + t.n + ' blocks \u00B7 ' +
+        (bench.mean * 1000 / t.n).toFixed(2) + ' \u00B5s per block';
+    } else {
+      $('t-main').textContent = single(t.solve);
+      $('t-sub').textContent = 'single run \u00B7 ' + t.n + ' blocks' + (benchRunning ? ' \u00B7 measuring more precisely\u2026' : '');
+    }
+
+    var comp = [['Read your input', t.parse], ['Solve (the method)', t.solve], ['Physical check', t.check], ['Show results', t.show]];
+    var mx = Math.max.apply(null, comp.map(function (c) { return c[1] || 0; })) || 1;
+    $('t-break').innerHTML = comp.filter(function (c) { return c[1] !== null; }).map(function (c) {
+      return '<div class="brow"><span>' + c[0] + '</span><div class="bar"><i style="width:' + Math.max(1, Math.round(100 * c[1] / mx)) + '%"></i></div><span class="num">' + single(c[1]) + '</span></div>';
+    }).join('') + '<div class="brow"><span><b>Total</b></span><span></span><span class="num"><b>' + single(t.total) + '</b></span></div>';
+
+    $('t-hint').textContent = 'One run of a small stack is shorter than this browser can time (its clock ticks about every ' + resText() +
+      '). So the solver is repeated many times and the total is divided by the number of runs.';
+    if (bench) {
+      var cells = [[fmtTime(bench.mean), 'average per run'], [fmtTime(bench.median), 'median per run'], [fmtTime(bench.min), 'fastest'],
+                   [fmtTime(bench.max), 'slowest'], [Math.round(1000 / bench.mean).toLocaleString(), 'runs per second'], [bench.runs.toLocaleString(), 'runs timed']];
+      $('t-grid').innerHTML = cells.map(function (c) { return '<div class="cell"><b>' + c[0] + '</b><span>' + c[1] + '</span></div>'; }).join('');
+    } else {
+      $('t-grid').innerHTML = '';
+    }
+    $('t-hist').innerHTML = runLog.map(function (h) {
+      return '<tr><td>' + h.id + '</td><td>' + h.n + '</td><td>' + single(h.solve) + '</td><td>' + single(h.total) + '</td></tr>';
+    }).join('');
+    $('t-note').textContent = 'Measured on this device with performance.now(). Only JavaScript work is counted, not the time you spend reading or tapping. ' +
+      'A single run also includes the browser\u2019s one-time start-up work (compiling the code), so the first run is usually slower than the average. ' +
+      'The precise figure runs the plain solver' + (lastRepair ? ' (including the Phase 5 re-join)' : '') + ', with no log and no physical check.';
+  }
+
+  function activateTab(id) {
+    document.querySelectorAll('.tab').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-tab') === id); });
+    document.querySelectorAll('.panel').forEach(function (p) { p.classList.toggle('active', p.id === id); });
+    if (id === 'p-timing' && benchStale) startBench();
+  }
+
+  function copyResults() {
+    if (!lastResult) return;
+    var text = 'block,acceleration\n' + lastResult.acceleration.map(function (a, i) { return (i + 1) + ',' + a; }).join('\n');
+    var done = function () { $('btn-copy').textContent = 'Copied'; setTimeout(function () { $('btn-copy').textContent = 'Copy accelerations'; }, 1500); };
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+  }
+
+
+  // ---- Visualize: a light 1D animation of the result ---------------------------------------------------
+  // Every block starts at rest on a common centre line and moves with its own constant acceleration,
+  // so its position grows as t squared and its speed grows steadily. Only the rows that are on screen
+  // are drawn, on one canvas, with no per-frame allocation.
+  var TMOVE = 6, THOLD = 0.9, TFADE = 0.4, TLOOP = TMOVE + THOLD + TFADE;
+  var FONT = 'Avenir, "Avenir Next", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  var RGB = { right: '43,93,135', left: '194,86,28', rest: '138,148,163' };
+  var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var ICON_PLAY = '<svg viewBox="0 0 22 22" fill="currentColor"><path d="M6.5 4.5L17 11L6.5 17.5Z"/></svg>';
+  var ICON_ZOOM = '<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="9.5" r="5.8"/><path d="M14 14L19 19"/><path d="M9.5 7V12M7 9.5H12"/></svg>';
+  var ICON_FIT = '<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="9.5" r="5.8"/><path d="M14 14L19 19"/><path d="M7 9.5H12"/></svg>';
+  var ICON_PAUSE = '<svg viewBox="0 0 22 22" fill="currentColor"><rect x="5.5" y="4.5" width="4" height="13" rx="1"/><rect x="12.5" y="4.5" width="4" height="13" rx="1"/></svg>';
+  var VZ = { open: false, playing: false, t: 0, speed: 1, scale: 'sqrt', zoom: 'fit', raf: 0, last: 0, sel: -1, pushed: false,
+             n: 0, a: null, m: null, F: null, r: null, fill: null, rgb: null, txt: null, strong: null, gFrom: null, gTo: null,
+             Fmax: 0, hasForce: false, padTop: 8, allRest: false, W: 0, H: 0, dpr: 1, rowH: 20, fitRow: 20, fitH: 20, scrollY: 0, labelW: 44, ctx: null };
+
+  function vzFmtA(a) { var s = Math.abs(a); return (a < 0 ? '\u2212' : '+') + (s >= 100 ? s.toFixed(0) : (s >= 10 ? s.toFixed(1) : s.toFixed(2))); }
+
+  // Display ratio r in [-1, 1] for every block. "Compressed" uses sqrt(|a|) so slow blocks stay visible;
+  // the order from slow to fast is the same in both modes.
+  function vzRatios() {
+    var pw = VZ.scale === 'sqrt' ? 0.5 : 1, n = VZ.n, mx = 0, i, v;
+    VZ.r = new Float64Array(n); VZ.fill = new Array(n); VZ.rgb = new Array(n); VZ.strong = new Uint8Array(n);
+    for (i = 0; i < n; i++) {
+      v = Math.abs(VZ.a[i]) < 1e-9 ? 0 : Math.pow(Math.abs(VZ.a[i]), pw);
+      VZ.r[i] = VZ.a[i] < 0 ? -v : v;
+      if (v > mx) mx = v;
+    }
+    for (i = 0; i < n; i++) {
+      var rr = mx > 0 ? VZ.r[i] / mx : 0, ar = Math.abs(rr);
+      VZ.r[i] = rr;
+      var col = rr > 0 ? RGB.right : (rr < 0 ? RGB.left : RGB.rest);
+      var op = rr === 0 ? 0.40 : 0.32 + 0.68 * Math.pow(ar, 0.6);
+      VZ.rgb[i] = 'rgb(' + col + ')';
+      VZ.fill[i] = 'rgba(' + col + ',' + op.toFixed(3) + ')';
+      VZ.strong[i] = op > 0.6 ? 1 : 0;
+    }
+  }
+
+  function vzLayout() {
+    var sc = $('viz-scroll'), cv = $('viz-canvas');
+    VZ.W = sc.clientWidth; VZ.H = sc.clientHeight;
+    if (!VZ.W || !VZ.H) return;
+    VZ.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(VZ.W * VZ.dpr); cv.height = Math.round(VZ.H * VZ.dpr);
+    cv.style.width = VZ.W + 'px'; cv.style.height = VZ.H + 'px'; cv.style.marginBottom = (-VZ.H) + 'px';
+    VZ.ctx = cv.getContext('2d');
+    var floorPad = 30, pad = VZ.padTop;
+    VZ.fitH = (VZ.H - pad - floorPad) / VZ.n;                 // row height that would fit every block on screen
+    VZ.fitRow = Math.max(0.6, Math.min(38, VZ.fitH));
+    var oldRow = VZ.rowH;
+    VZ.rowH = (VZ.zoom === 'detail') ? Math.max(VZ.fitRow, 26) : VZ.fitRow;
+    $('viz-spacer').style.height = (pad + VZ.n * VZ.rowH + floorPad) + 'px';
+    $('viz-zoom').style.visibility = (VZ.fitH < 18) ? 'visible' : 'hidden';
+    $('viz-zoom').innerHTML = VZ.zoom === 'detail' ? ICON_FIT : ICON_ZOOM;
+    $('viz-zoom').setAttribute('aria-label', VZ.zoom === 'detail' ? 'Fit all blocks on screen' : 'Zoom in on the blocks');
+    if (oldRow && Math.abs(oldRow - VZ.rowH) > 0.01) {         // keep the same rows in view after a zoom change
+      var mid = (sc.scrollTop + VZ.H / 2 - pad) / oldRow;
+      sc.scrollTop = Math.max(0, pad + mid * VZ.rowH - VZ.H / 2);
+    }
+    VZ.scrollY = sc.scrollTop;
+    vzDraw();
+  }
+
+  function vzRoundRect(c, x, y, w, h, r) {
+    c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+  }
+
+  function vzDraw() {
+    var c = VZ.ctx; if (!c || !VZ.open) return;
+    var W = VZ.W, H = VZ.H, n = VZ.n, rh = VZ.rowH, i;
+    c.setTransform(VZ.dpr, 0, 0, VZ.dpr, 0, 0);
+    c.clearRect(0, 0, W, H);
+
+    // clock -> progress. x is proportional to t^2 (constant acceleration from rest).
+    var t = VZ.t, p = t < TMOVE ? t / TMOVE : 1, alpha = 1;
+    if (t < 0.25) alpha = t / 0.25;
+    else if (t > TMOVE + THOLD) alpha = Math.max(0, 1 - (t - TMOVE - THOLD) / TFADE);
+    var pe = p * p, vProg = t < TMOVE ? 2 * p / TMOVE : 0;
+
+    var labelW = VZ.labelW, trackL = labelW + 8, trackR = W - 8, x0 = (trackL + trackR) / 2;
+    var bw = Math.max(30, Math.min(84, (trackR - trackL) * 0.16));
+    var A = Math.max(12, (trackR - trackL) / 2 - bw / 2 - 4 - (VZ.hasForce ? 38 : 0));
+
+    // start line
+    c.strokeStyle = '#CDD3DA'; c.lineWidth = 1; c.setLineDash([4, 4]);
+    c.beginPath(); c.moveTo(x0, 0); c.lineTo(x0, H); c.stroke(); c.setLineDash([]);
+
+    var pad = VZ.padTop, i0 = Math.max(0, Math.floor((VZ.scrollY - pad) / rh)), i1 = Math.min(n - 1, Math.ceil((VZ.scrollY + H - pad) / rh));
+    var gap = rh >= 10 ? 3 : (rh >= 4 ? 1 : 0), bh = Math.max(1, rh - gap), round = rh >= 12;
+
+    // brackets for blocks that stay stuck together
+    c.fillStyle = '#B9CFE0';
+    for (i = i0; i <= i1; i++) {
+      if (VZ.gTo[i] > VZ.gFrom[i] && (i === VZ.gFrom[i] || i === i0)) {
+        var top = pad + Math.max(VZ.gFrom[i], i0) * rh - VZ.scrollY + gap / 2, bot = pad + (Math.min(VZ.gTo[i], i1) + 1) * rh - VZ.scrollY - gap / 2;
+        c.fillRect(labelW - 2, top, 3, Math.max(1, bot - top));
+      }
+    }
+
+    // blocks
+    var showText = rh >= 13 && bw >= 44;
+    c.font = Math.min(12, bh * 0.74).toFixed(1) + 'px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle';
+    for (i = i0; i <= i1; i++) {
+      var y = pad + i * rh - VZ.scrollY + gap / 2, r = VZ.r[i], ar = Math.abs(r), cx = x0 + A * r * pe;
+      c.globalAlpha = alpha;
+      if (r !== 0 && vProg > 0) {                              // motion streak behind a moving block
+        var L = Math.min(A * ar * vProg * 0.6, bw * 1.6);
+        if (L > 1.5) {
+          c.globalAlpha = alpha * 0.22; c.fillStyle = VZ.rgb[i];
+          if (r > 0) c.fillRect(cx - bw / 2 - L, y, L, bh); else c.fillRect(cx + bw / 2, y, L, bh);
+          c.globalAlpha = alpha;
+        }
+      }
+      c.fillStyle = VZ.fill[i];
+      if (round) { vzRoundRect(c, cx - bw / 2, y, bw, bh, 4); c.fill(); } else c.fillRect(cx - bw / 2, y, bw, bh);
+      if (i === VZ.sel) { c.strokeStyle = '#1C2430'; c.lineWidth = 2; c.strokeRect(cx - bw / 2, y, bw, bh); }
+      if (showText) { c.fillStyle = VZ.strong[i] ? '#fff' : '#1C2430'; c.fillText(VZ.txt[i], cx, y + bh / 2 + 0.5); }
+      var F = VZ.F[i];                                         // the external force put on this block
+      if (F !== 0 && rh >= 12) {
+        var len = 10 + 24 * Math.abs(F) / VZ.Fmax, dir = F > 0 ? 1 : -1, ex = cx + dir * bw / 2, ey = y + bh / 2;
+        c.strokeStyle = '#1C2430'; c.lineWidth = 1.7; c.lineCap = 'round'; c.lineJoin = 'round';
+        c.beginPath(); c.moveTo(ex, ey); c.lineTo(ex + dir * len, ey);
+        c.moveTo(ex + dir * (len - 5), ey - 4); c.lineTo(ex + dir * len, ey); c.lineTo(ex + dir * (len - 5), ey + 4); c.stroke();
+      }
+    }
+    c.globalAlpha = 1;
+
+    // block numbers
+    c.font = '11px ' + FONT; c.textAlign = 'right'; c.fillStyle = '#5B6472';
+    var step = rh >= 13 ? 1 : (function () { var need = Math.ceil(14 / rh), s = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000]; for (var k = 0; k < s.length; k++) if (s[k] >= need) return s[k]; return 1000; })();
+    for (i = i0; i <= i1; i++) {
+      if (step === 1 || (i + 1) % step === 0 || i === 0) c.fillText(String(i + 1), labelW - 8, pad + i * rh - VZ.scrollY + rh / 2);
+    }
+
+    // the fixed floor under the last block
+    var fy = pad + n * rh - VZ.scrollY + 3;
+    if (fy < H + 10) {
+      c.strokeStyle = '#1C2430'; c.lineWidth = 2; c.beginPath(); c.moveTo(trackL - 4, fy); c.lineTo(trackR + 4, fy); c.stroke();
+      c.lineWidth = 1; c.strokeStyle = '#8A94A3'; c.beginPath();
+      for (var hx = trackL; hx < trackR; hx += 12) { c.moveTo(hx + 6, fy + 1); c.lineTo(hx, fy + 9); }
+      c.stroke();
+      c.fillStyle = '#5B6472'; c.textAlign = 'left'; c.fillText('floor', 4, fy + 8);
+    }
+  }
+
+  function vzUpdateUI() {
+    var tt = Math.min(VZ.t, TMOVE);
+    $('viz-time').textContent = 't = ' + tt.toFixed(1) + ' / ' + TMOVE.toFixed(1) + ' s';
+    var s = $('viz-scrub');
+    if (VZ.playing || document.activeElement !== s) s.value = Math.round(1000 * tt / TMOVE);
+    $('viz-play').innerHTML = (VZ.playing ? ICON_PAUSE + 'Pause' : ICON_PLAY + 'Play');
+  }
+
+  function vzFrame(now) {
+    VZ.raf = 0;
+    if (!VZ.open) return;
+    var dt = Math.min(0.1, Math.max(0, (now - VZ.last) / 1000)); VZ.last = now;
+    if (VZ.playing) { VZ.t += dt * VZ.speed; if (VZ.t >= TLOOP) VZ.t -= TLOOP; }
+    vzDraw(); vzUpdateUI();
+    if (VZ.playing) vzSchedule();
+  }
+  function vzSchedule() { if (!VZ.raf && VZ.open) { VZ.raf = requestAnimationFrame(vzFrame); } }
+  function vzRedraw() { if (VZ.playing) vzSchedule(); else { vzDraw(); vzUpdateUI(); } }
+
+  function vzReadout() {
+    var el = $('viz-readout'), i = VZ.sel;
+    if (i < 0) { el.textContent = VZ.allRest ? 'Every block is at rest, so nothing moves.' : 'Tap a block to see its numbers.'; return; }
+    var a = VZ.a[i], F = VZ.F[i];
+    var fs = F === 0 ? '0' : (Number.isInteger(F) ? (F < 0 ? '\u2212' : '+') + Math.abs(F) : fmt(F));
+    var dir = Math.abs(a) < 1e-9 ? 'at rest' : (a > 0 ? 'moves right' : 'moves left');
+    var grp = VZ.gTo[i] > VZ.gFrom[i] ? 'with blocks ' + (VZ.gFrom[i] + 1) + '\u2013' + (VZ.gTo[i] + 1) : 'independent';
+    el.innerHTML = '<b>Block ' + (i + 1) + '</b> &middot; mass ' + VZ.m[i] + ' kg &middot; external force ' + fs + ' N<br>' +
+      'a = <b>' + fmt(a) + ' m/s&sup2;</b> &middot; ' + dir + ' &middot; ' + grp + '<br>' +
+      '<span class="dim">After 1 s from rest: v = ' + fmt(a) + ' m/s, x = ' + fmt(a / 2) + ' m</span>';
+  }
+
+  function vzHint() {
+    $('viz-hint').textContent = VZ.scale === 'sqrt'
+      ? 'Compressed: distance follows \u221A|a|, so slow blocks stay visible.'
+      : 'True ratio: distance is proportional to a; very slow blocks barely move.';
+  }
+
+  function openViz() {
+    if (!lastResult || !lastInput) return;
+    var n = lastResult.n, i;
+    VZ.n = n; VZ.a = lastResult.acceleration; VZ.m = lastInput.mass; VZ.F = lastInput.force;
+    VZ.gFrom = new Int32Array(n); VZ.gTo = new Int32Array(n);
+    lastResult.groups.forEach(function (g) { for (var k = g.from - 1; k < g.to; k++) { VZ.gFrom[k] = g.from - 1; VZ.gTo[k] = g.to - 1; } });
+    VZ.Fmax = 0; VZ.allRest = true; VZ.txt = new Array(n);
+    for (i = 0; i < n; i++) {
+      if (Math.abs(VZ.F[i]) > VZ.Fmax) VZ.Fmax = Math.abs(VZ.F[i]);
+      if (Math.abs(VZ.a[i]) > 1e-9) VZ.allRest = false;
+      VZ.txt[i] = vzFmtA(VZ.a[i]);
+    }
+    VZ.hasForce = VZ.Fmax > 0;
+    if (VZ.Fmax === 0) VZ.Fmax = 1;
+    vzRatios();
+    VZ.t = 0; VZ.sel = -1; VZ.zoom = 'fit'; VZ.rowH = 0; VZ.playing = !reduceMotion;
+    $('viz-sub').textContent = n + (n === 1 ? ' block' : ' blocks');
+    $('viz').hidden = false; document.body.classList.add('noscroll'); VZ.open = true;
+    $('viz-scroll').scrollTop = 0;
+    try { history.pushState({ viz: 1 }, '', '#visualize'); VZ.pushed = true; } catch (e) { VZ.pushed = false; }
+    vzHint(); vzReadout(); vzLayout(); vzUpdateUI();
+    VZ.last = performance.now(); if (VZ.playing) vzSchedule();
+    $('viz-play').focus();
+  }
+
+  function vzDoClose() {
+    if (!VZ.open) return;
+    VZ.open = false; VZ.playing = false;
+    if (VZ.raf) { cancelAnimationFrame(VZ.raf); VZ.raf = 0; }
+    $('viz').hidden = true; document.body.classList.remove('noscroll');
+    $('btn-viz').focus();
+  }
+  function closeViz() {
+    if (!VZ.open) return;
+    if (VZ.pushed) { VZ.pushed = false; history.back(); setTimeout(vzDoClose, 300); } else vzDoClose();
+  }
+
+  function initViz() {
+    $('btn-viz').addEventListener('click', openViz);
+    $('viz-close').addEventListener('click', closeViz);
+    window.addEventListener('popstate', function () { VZ.pushed = false; vzDoClose(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && VZ.open) closeViz(); });
+    $('viz-play').addEventListener('click', function () { VZ.playing = !VZ.playing; VZ.last = performance.now(); vzRedraw(); if (VZ.playing) vzSchedule(); });
+    $('viz-restart').addEventListener('click', function () { VZ.t = 0; VZ.playing = true; VZ.last = performance.now(); vzRedraw(); vzSchedule(); });
+    $('viz-scrub').addEventListener('input', function () { VZ.playing = false; VZ.t = (this.value / 1000) * TMOVE; vzRedraw(); });
+    $('viz-speed').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      VZ.speed = Number(b.getAttribute('data-v'));
+      this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+    });
+    $('viz-scale').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      VZ.scale = b.getAttribute('data-v');
+      this.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      vzRatios(); vzHint(); vzRedraw();
+    });
+    $('viz-zoom').addEventListener('click', function () { VZ.zoom = VZ.zoom === 'detail' ? 'fit' : 'detail'; vzLayout(); });
+    $('viz-scroll').addEventListener('scroll', function () { VZ.scrollY = this.scrollTop; vzRedraw(); }, { passive: true });
+    $('viz-scroll').addEventListener('click', function (e) {
+      var rect = this.getBoundingClientRect(), idx = Math.floor((e.clientY - rect.top + this.scrollTop - VZ.padTop) / VZ.rowH);
+      VZ.sel = (idx >= 0 && idx < VZ.n && idx !== VZ.sel) ? idx : -1;
+      vzReadout(); vzRedraw();
+    });
+    var resize = function () { if (VZ.open) vzLayout(); };
+    if (window.ResizeObserver) {
+      new ResizeObserver(function () {
+        var sc = $('viz-scroll');
+        if (VZ.open && (sc.clientWidth !== VZ.W || sc.clientHeight !== VZ.H)) vzLayout();
+      }).observe($('viz-scroll'));
+    }
+    window.addEventListener('resize', resize); window.addEventListener('orientationchange', resize);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && VZ.open && VZ.playing) { VZ.last = performance.now(); vzSchedule(); } });
+  }
+
+  $('mode').addEventListener('change', function () { setMode(this.value); });
+  $('btn-set').addEventListener('click', function () { setRows(Number($('count').value)); });
+  $('count').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); setRows(Number($('count').value)); } });
+  $('btn-add').addEventListener('click', function () {
+    setRows(rowCount() + 1);
+    var last = grid.rows[rowCount() - 1];
+    last.scrollIntoView({ block: 'nearest' }); last.querySelector('input').focus();
+  });
+  $('btn-clear').addEventListener('click', function () {
+    fillGrid(Math.max(1, rowCount()), null);
+    $('out').hidden = true;
+  });
+  $('btn-run').addEventListener('click', run);
+  $('btn-example').addEventListener('click', loadExample);
+  $('btn-small').addEventListener('click', loadSmall);
+  $('kind').addEventListener('click', function (e) { var b = e.target.closest('button[data-kind]'); if (b) setKind(b.getAttribute('data-kind')); });
+  $('btn-random').addEventListener('click', loadRandom);
+  $('btn-copy').addEventListener('click', copyResults);
+  fillGrid(5, null);
+  setMode('fmax');
+  initViz();
+  $('btn-bench').addEventListener('click', function () { benchToken++; benchRunning = false; startBench(); });
+  document.querySelectorAll('.tab').forEach(function (b) { b.addEventListener('click', function () { activateTab(b.getAttribute('data-tab')); }); });
+})();
+</script>
+</body>
+</html>
